@@ -1,14 +1,22 @@
 const Telegraf = require('telegraf');
 const express = require('express');
+const http = require('http');
+
 const expressApp = express();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+console.log(process.env);
 expressApp.use(bot.webhookCallback('/secret-path'));
 // bot.telegram.setWebhook('https://server.tld:8443/secret-path');
 
 expressApp.get('/', (req, res) => {
     res.send('Hello World!')
 });
+
+// prevent idle
+setInterval(function() {
+    http.get("http://arjen-tg-node.herokuapp.com");
+}, 300000); // every 5 minutes (300000)
 
 expressApp.listen(process.env.PORT, () => {
     console.log(`Example app listening on port ${process.env.PORT}!`)
