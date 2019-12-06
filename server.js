@@ -1,9 +1,10 @@
 const Telegraf = require('telegraf');
+const TelegrafInlineMenu = require('telegraf-inline-menu');
 const express = require('express');
 const http = require('http');
 const Scrapper = require('./lib/scrapper');
 
-
+const menu = new TelegrafInlineMenu(ctx => `Hey ${ctx.from.first_name}!`);
 const expressApp = express();
 
 // Scrapper.getPageHtml('http://google.com').then(data => console.log(data));
