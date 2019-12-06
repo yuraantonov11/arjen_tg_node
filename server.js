@@ -26,6 +26,7 @@ expressApp.listen(process.env.PORT, () => {
     console.log(`Example app listening on port ${process.env.PORT}!`)
 });
 
+bot.use(menu.init());
 bot.start((ctx) => ctx.reply('Welcome'));
 bot.help((ctx) => ctx.reply('Send me a sticker'));
 bot.on('sticker', (ctx) => ctx.reply('👍'));
