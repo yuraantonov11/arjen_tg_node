@@ -1,14 +1,12 @@
 const Telegraf = require('telegraf');
 const express = require('express');
-const request = require('request-promise-native');
+const http = require('http');
 const Scrapper = require('./lib/scrapper');
 
 
 const expressApp = express();
 
-// Scrapper.getProductData().then(res => console.log(res));
-
-Scrapper.getProductData('https://arjen.com.ua/koftu/6464/').then(data => console.log(data));
+// Scrapper.getPageHtml('http://google.com').then(data => console.log(data));
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 expressApp.use(bot.webhookCallback('/secret-path'));
