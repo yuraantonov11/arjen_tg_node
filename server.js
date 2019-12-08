@@ -3,8 +3,40 @@ const TelegrafInlineMenu = require('telegraf-inline-menu');
 const express = require('express');
 const http = require('http');
 const Scrapper = require('./lib/scrapper');
+const validUrl = require('valid-url');
 
-const menu = new TelegrafInlineMenu(ctx => `Hey ${ctx.from.first_name}!`);
+
+const menu = new TelegrafInlineMenu(ctx => `Привіт ${ctx.from.first_name}!`);
+menu.setCommand('start');
+
+const people = {};
+menu.question('Отримати дані про товар', 'get', {
+    uniqueIdentifier: '666',
+    questionText: 'Введи посилання на товар',
+    setFunc: async (_ctx, key) => {
+        if (validUrl.isUri(key)){
+            const url = new URL(key);
+            if (url.hostname !== 'arjen.com.ua'){
+                return _ctx.reply('Введи посилання на сайт arjen.com.ua.')
+            }
+            const data = await Scrapper.getProductData(key);
+            return _ctx.reply(JSON.stringify(data))
+        } else {
+            return _ctx.reply('Не вірне писилання.');
+        }
+
+    }
+});
+
+menu.question('Підписатись на наявність товару (в розробці)', 'subscribe', {
+    uniqueIdentifier: '666',
+    questionText: 'Введи посилання на товар',
+    setFunc: (_ctx, key) => {
+        people[key] = {};
+        console.log(people);
+    }
+});
+
 const expressApp = express();
 
 // Scrapper.getPageHtml('http://google.com').then(data => console.log(data));
@@ -33,3 +65,4 @@ bot.use(menu.init());
 // bot.hears('hi', (ctx) => ctx.reply('Hey there'));
 // bot.launch();
 bot.startPolling();
+
