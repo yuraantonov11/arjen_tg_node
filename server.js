@@ -9,6 +9,8 @@ const validUrl = require('valid-url');
 const menu = new TelegrafInlineMenu(ctx => `Привіт ${ctx.from.first_name}!`);
 menu.setCommand('start');
 
+menu.question('Авторизуватись в arjen.com', 'auth', '');
+
 const people = {};
 menu.question('Отримати дані про товар', 'get', {
     uniqueIdentifier: '666',
