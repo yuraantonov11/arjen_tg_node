@@ -1,6 +1,7 @@
 const Telegraf = require('telegraf');
 const TelegrafInlineMenu = require('telegraf-inline-menu');
 const express = require('express');
+const mongoose  = require('mongoose');
 const http = require('http');
 const Scrapper = require('./lib/scrapper');
 const validUrl = require('valid-url');
@@ -9,7 +10,14 @@ const validUrl = require('valid-url');
 const menu = new TelegrafInlineMenu(ctx => `Привіт ${ctx.from.first_name}!`);
 menu.setCommand('start');
 
-menu.question('Авторизуватись в arjen.com', 'auth', '');
+menu.question('Авторизуватись в arjen.com', 'auth', {
+    uniqueIdentifier: 'auth',
+    questionText: 'Введи логін',
+    setFunc: (_ctx, key) => {
+        people[key] = {};
+        console.log(people);
+    }
+});
 
 const people = {};
 menu.question('Отримати дані про товар', 'get', {
@@ -56,8 +64,25 @@ setInterval(function() {
     http.get("http://arjen-tg-node.herokuapp.com");
 }, 300000); // every 5 minutes (300000)
 
-expressApp.listen(process.env.PORT, () => {
-    console.log(`Example app listening on port ${process.env.PORT}!`)
+mongoose.connect('mongodb://yuraantonov11:r8DoC6ohdJds@ds353738.mlab.com:53738/arjen_tg_bot',
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    },
+    (err) => {
+    if (err) {
+        console.error('Error connecting to db: ', err);
+    } else {
+        console.info('Mongodb connection successful');
+    }
+
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+
+    expressApp.listen(process.env.PORT, () => {
+        console.log(`Example app listening on port ${process.env.PORT}!`)
+    });
 });
 
 bot.use(menu.init());
