@@ -23,6 +23,20 @@ module.exports = {
         languageCode: {
             type: String,
             required: false
+        },
+        arjenLogin: {
+            type: String,
+            required: false
+        },
+        arjenPassword: {
+            type: String,
+            required: false
+        },
+        arjen: {
+            username: {
+                type: String,
+                required: false
+            }
         }
     },
 

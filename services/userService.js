@@ -4,30 +4,23 @@ const models = require('../models');
 const validationService = require('./validationService');
 
 module.exports = {
-    createUser: function(params) {
-        return new Promise((resolve, reject) => {
-            if (!params.telegramId || !params.username) {
-                reject('Missing params');
-            } else {
-                validationService.doesSuchUserExist(params.telegramId)
-                .then(result => {
-                    if (result) {
-                        reject('This email has been used. Try Login');
-                    } else {
-                        new models.user(params).save()
-                        .then(user => {
-                            resolve(user);
-                        }).catch((err) => {
-                            console.error('Error occured while creating user:', err);
-                            reject('Server side error');
-                        });
-                    }
-                }).catch(err => {
-                    console.error('User validation error', err);
-                    reject('Server side error');
-                });
+    createUser: async function(params) {
+        if (!params.telegramId || !params.username) {
+            throw 'Missing params';
+        } else {
+            let isUserExist;
+            try {
+                isUserExist = await validationService.doesSuchUserExist(params.telegramId)
+            } catch {
+                throw 'Server side error';
             }
-        });
+            if (isUserExist) {
+                throw 'This user already exist';
+            } else {
+                return await models.user(params).save()
+            }
+
+        }
     },
 
     getUser: function(params) {
@@ -58,24 +51,22 @@ module.exports = {
         });
     },
 
-    updateUser: function(params) {
-        return new Promise((resolve, reject) => {
-            if (!params.email) {
-                reject('Missing Params');
+    updateUser: async function(params) {
+        if (!params.telegramId) {
+            throw 'Missing Params';
+        } else {
+            const user = await models.user.findOneAndUpdate({
+                telegramId: params.telegramId,
+            }, params);
+            if (user) {
+                return user;
             } else {
-                models.user.findOneAndUpdate({
-                    email: params.email,
-                }, params).then(user => {
-                    if (user) {
-                        resolve(user);
-                    } else {
-                        reject('No such User exist');
-                    }
-                }).catch(err => {
-                    console.error('Error occured at saveUser', err);
-                    reject('Server side error');
-                });
+                throw 'No such User exist';
             }
-        });
-    }
+            // console.error('Error occured at saveUser', err);
+            // reject('Server side error');
+        }
+    },
+
+    setPassword(){}
 };
