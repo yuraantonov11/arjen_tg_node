@@ -2,38 +2,25 @@
 
 module.exports = {
     schema: {
-        email: {
+        telegramId: {
+            type: Number,
+            required: true,
+            unique: true,
+        },
+        username: {
             type: String,
             required: true,
             unique: true,
         },
-        mobile: {
+        firstName: {
             type: String,
             required: false
         },
-        name: {
+        lastName: {
             type: String,
             required: false
         },
-        gender: {
-            type: String,
-            required: false,
-            default: 'male'
-        },
-        password: {
-            type: String,
-            required: true
-        },
-        dob: {
-            type: Date,
-            required: false
-        },
-        deactivated: {
-            type: Boolean,
-            required: false,
-            default: false
-        },
-        type: {
+        languageCode: {
             type: String,
             required: false
         }

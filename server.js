@@ -5,9 +5,22 @@ const mongoose  = require('mongoose');
 const http = require('http');
 const Scrapper = require('./lib/scrapper');
 const validUrl = require('valid-url');
+const {createUser} = require("./services/userService");
 
 
-const menu = new TelegrafInlineMenu(ctx => `Привіт ${ctx.from.first_name}!`);
+const menu = new TelegrafInlineMenu(async ctx => {
+    const tgUserData = ctx.from;
+    const userData = {
+        telegramId: tgUserData.id,
+        firstName: tgUserData.first_name,
+        lastName: tgUserData.last_name,
+        username: tgUserData.username,
+        languageCode: tgUserData.language_code,
+    };
+    await createUser(userData);
+
+    return `Привіт ${ctx.from.first_name}!`
+});
 menu.setCommand('start');
 
 menu.question('Авторизуватись в arjen.com', 'auth', {
@@ -67,9 +80,11 @@ setInterval(function() {
 mongoose.connect('mongodb://yuraantonov11:r8DoC6ohdJds@ds353738.mlab.com:53738/arjen_tg_bot',
     {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useCreateIndex : true
     },
     (err) => {
+
     if (err) {
         console.error('Error connecting to db: ', err);
     } else {
@@ -86,7 +101,7 @@ mongoose.connect('mongodb://yuraantonov11:r8DoC6ohdJds@ds353738.mlab.com:53738/a
 });
 
 bot.use(menu.init());
-// bot.start((ctx) => ctx.reply('Welcome'));
+bot.start((ctx) => ctx.reply('Welcome'));
 // bot.help((ctx) => ctx.reply('Send me a sticker'));
 // bot.on('sticker', (ctx) => ctx.reply('👍'));
 // bot.hears('hi', (ctx) => ctx.reply('Hey there'));

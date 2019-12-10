@@ -3,31 +3,22 @@ const env = process.env.NODE_ENV || 'development';
 const models = require('../models');
 const validationService = require('./validationService');
 
-const bcrypt = require('bcrypt');
-
 module.exports = {
     createUser: function(params) {
         return new Promise((resolve, reject) => {
-            if (!params.email || !params.password) {
+            if (!params.telegramId || !params.username) {
                 reject('Missing params');
             } else {
-                validationService.doesSuchUserExist(params.email)
+                validationService.doesSuchUserExist(params.telegramId)
                 .then(result => {
                     if (result) {
                         reject('This email has been used. Try Login');
                     } else {
-                        bcrypt.hash(params.password, 2).then((hash) => {
-                            params.password = hash;
-                            // insert user info to db
-
-                            new models.user(params).save().then(user => {
-                                resolve(user);
-                            }).catch((err) => {
-                                console.error('Error occured while creating user:', err);
-                                reject('Server side error');
-                            });
+                        new models.user(params).save()
+                        .then(user => {
+                            resolve(user);
                         }).catch((err) => {
-                            console.error('Error encrypting password', err);
+                            console.error('Error occured while creating user:', err);
                             reject('Server side error');
                         });
                     }
