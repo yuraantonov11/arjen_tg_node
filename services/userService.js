@@ -68,5 +68,48 @@ module.exports = {
         }
     },
 
+    getArjenCredentials: async function(telegramId){
+        const user = await models.user.findOne({telegramId})
+            .select({
+                'arjen.username': 1,
+                'arjen.password': 1
+            });
+        return user._doc.arjen
+    },
+
+    updateArjenPassword: async function(telegramId, pwd) {
+        if (!telegramId || !pwd) {
+            throw 'Missing Params';
+        } else {
+            const user = await models.user.findOneAndUpdate(
+                {telegramId},
+                {$set: {'arjen.password': pwd}
+            });
+
+            if (user) {
+                return user;
+            } else {
+                throw 'No such User exist';
+            }
+        }
+    },
+
+    updateArjenUsername: async function(telegramId, username) {
+        if (!telegramId || !username) {
+            throw 'Missing Params';
+        } else {
+            const user = await models.user.findOneAndUpdate(
+                {telegramId},
+                {$set: {'arjen.username': username}
+                });
+
+            if (user) {
+                return user;
+            } else {
+                throw 'No such User exist';
+            }
+        }
+    },
+
     setPassword(){}
 };

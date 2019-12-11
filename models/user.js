@@ -36,6 +36,10 @@ module.exports = {
             username: {
                 type: String,
                 required: false
+            },
+            password: {
+                type: String,
+                required: false
             }
         }
     },

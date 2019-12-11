@@ -5,6 +5,9 @@ const mongoose = require('mongoose');
 const http = require('http');
 const Scrapper = require('./lib/scrapper');
 const validUrl = require('valid-url');
+const {getArjenCredentials} = require("./services/userService");
+const {updateArjenPassword} = require("./services/userService");
+const {updateArjenUsername} = require("./services/userService");
 const {createUser, updateUser} = require("./services/userService");
 
 
@@ -35,9 +38,13 @@ menu
             uniqueIdentifier: 'username',
             questionText: 'Введи логін',
             joinLastRow: true,
-            setFunc: (_ctx, key) => {
-                people[ key ] = {};
-                console.log(people);
+            setFunc: async (_ctx, key) => {
+                try {
+                    const userData = formatData(_ctx.from);
+                    await updateArjenUsername(userData.telegramId, key)
+                } catch(e) {
+                    console.error(e);
+                }
             }
         })
     .question('Ввести пароль', 'password',
@@ -49,8 +56,7 @@ menu
                 await _ctx.deleteMessage();
                 try {
                     const userData = formatData(_ctx.from);
-                    userData.arjen = {username: key};
-                    await updateUser(userData)
+                    await updateArjenPassword(userData.telegramId, key)
                 } catch(e) {
                     console.error(e);
                 }
@@ -72,7 +78,8 @@ menu.question('Отримати дані про товар', 'get', {
             if (url.hostname !== 'arjen.com.ua') {
                 return _ctx.reply('Введи посилання на сайт arjen.com.ua.')
             }
-            const data = await Scrapper.getProductData(key);
+            const credentials = await getArjenCredentials(_ctx.from.id);
+            const data = await Scrapper.getProductData(key, credentials);
             return _ctx.reply(JSON.stringify(data))
         } else {
             return _ctx.reply('Не вірне писилання.');
@@ -109,9 +116,10 @@ setInterval(function() {
 
 mongoose.connect('mongodb://yuraantonov11:r8DoC6ohdJds@ds353738.mlab.com:53738/arjen_tg_bot',
     {
+        useCreateIndex: true,
+        useFindAndModify: false,
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useCreateIndex: true
     },
     (err) => {
 
