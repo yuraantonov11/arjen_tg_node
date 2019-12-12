@@ -74,7 +74,10 @@ module.exports = {
                 'arjen.username': 1,
                 'arjen.password': 1
             });
-        return user._doc.arjen
+        if(user){
+            return user._doc.arjen
+        }
+        return null
     },
 
     updateArjenPassword: async function(telegramId, pwd) {

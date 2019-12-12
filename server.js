@@ -73,18 +73,21 @@ menu.question('Отримати дані про товар', 'get', {
     uniqueIdentifier: '666',
     questionText: 'Введи посилання на товар',
     setFunc: async (_ctx, key) => {
-        if (validUrl.isUri(key)) {
+        if (validUrl.isWebUri(key)) {
             const url = new URL(key);
-            if (url.hostname !== 'arjen.com.ua') {
-                return _ctx.reply('Введи посилання на сайт arjen.com.ua.')
+            if (url.hostname !== 'arjen.com.ua' && url.hostname !== 'm.arjen.com.ua') {
+                return _ctx.reply('⚠ Введи посилання на сайт arjen.com.ua.')
+            } else {
+                if(url.hostname === 'm.arjen.com.ua'){
+                    url.hostname = 'arjen.com.ua';
+                }
             }
             const credentials = await getArjenCredentials(_ctx.from.id);
-            const data = await Scrapper.getProductData(key, credentials);
+            const data = await Scrapper.getProductData(url.href, credentials);
             return _ctx.reply(JSON.stringify(data))
         } else {
-            return _ctx.reply('Не вірне писилання.');
+            return _ctx.reply('🚫 Не вірне писилання.');
         }
-
     }
 });
 
@@ -93,7 +96,6 @@ menu.question('Підписатись на наявність товару (в �
     questionText: 'Введи посилання на товар',
     setFunc: (_ctx, key) => {
         people[ key ] = {};
-        console.log(people);
     }
 });
 
